@@ -805,6 +805,7 @@ class FlyoutController with ChangeNotifier, WidgetsBindingObserver {
     double horizontalOffset = 0.0,
     double margin = 8.0,
     Color? barrierColor,
+    EdgeInsets barrierMargin = const EdgeInsets.all(0),
     NavigatorState? navigatorKey,
     FlyoutTransitionBuilder? transitionBuilder,
     Duration? transitionDuration,
@@ -892,6 +893,7 @@ class FlyoutController with ChangeNotifier, WidgetsBindingObserver {
           flyoutKey: flyoutKey,
           navigatorBox: navigatorBox,
           barrierColor: barrierColor,
+          barrierMargin: barrierMargin,
           barrierRecognizer: barrierRecognizer,
           barrierDismissible: barrierDismissible,
           dismissWithEsc: dismissWithEsc,
@@ -974,6 +976,7 @@ class _FlyoutPage extends StatefulWidget {
     required this.flyoutKey,
     required this.navigatorBox,
     required this.barrierColor,
+    required this.barrierMargin,
     required this.barrierRecognizer,
     required this.barrierDismissible,
     required this.dismissWithEsc,
@@ -1001,6 +1004,7 @@ class _FlyoutPage extends StatefulWidget {
   final GlobalKey<State<StatefulWidget>> flyoutKey;
   final RenderBox navigatorBox;
   final Color? barrierColor;
+  final EdgeInsets barrierMargin;
   final GestureRecognizer? barrierRecognizer;
   final bool barrierDismissible;
   final bool dismissWithEsc;
@@ -1033,8 +1037,13 @@ class _FlyoutPageState extends State<_FlyoutPage> {
     return MenuInfoProvider(builder: (context, rootSize, menus, keys) {
       assert(menus.length == keys.length);
 
-      final barrier = ColoredBox(
+      final barrierContent = ColoredBox(
         color: widget.barrierColor ?? Colors.black.withValues(alpha: 0.3),
+      );
+
+      final barrier = Padding(
+        padding: widget.barrierMargin, // applying the margin here
+        child: barrierContent,
       );
 
       Widget box = Stack(children: [
