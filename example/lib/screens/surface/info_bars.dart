@@ -1,5 +1,5 @@
 import 'package:example/widgets/card_highlight.dart';
-import 'package:fluent_ui/fluent_ui.dart';
+import 'package:fluent_ui2/fluent_ui.dart';
 
 import '../../widgets/page.dart';
 

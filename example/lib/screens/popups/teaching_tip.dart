@@ -1,7 +1,7 @@
 import 'package:example/theme.dart';
 import 'package:example/widgets/card_highlight.dart';
 import 'package:example/widgets/page.dart';
-import 'package:fluent_ui/fluent_ui.dart';
+import 'package:fluent_ui2/fluent_ui.dart';
 import 'package:provider/provider.dart';
 
 class TeachingTipPage extends StatefulWidget {

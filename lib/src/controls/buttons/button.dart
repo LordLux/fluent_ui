@@ -1,4 +1,4 @@
-import 'package:fluent_ui/fluent_ui.dart';
+import 'package:fluent_ui2/fluent_ui.dart';
 
 const kDefaultButtonPadding = EdgeInsetsDirectional.only(
   start: 11.0,

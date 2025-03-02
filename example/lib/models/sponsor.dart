@@ -1,5 +1,5 @@
 import 'package:example/screens/home.dart';
-import 'package:fluent_ui/fluent_ui.dart';
+import 'package:fluent_ui2/fluent_ui.dart';
 import 'package:url_launcher/link.dart';
 
 /// Current sponsors of the project <3

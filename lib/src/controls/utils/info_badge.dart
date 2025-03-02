@@ -1,4 +1,4 @@
-import 'package:fluent_ui/fluent_ui.dart';
+import 'package:fluent_ui2/fluent_ui.dart';
 
 /// Badging is a non-intrusive and intuitive way to display notifications or
 /// bring focus to an area within an app - whether that be for notifications,

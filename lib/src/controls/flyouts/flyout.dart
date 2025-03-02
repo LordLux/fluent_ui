@@ -1,6 +1,6 @@
 import 'dart:math' as math;
 
-import 'package:fluent_ui/fluent_ui.dart';
+import 'package:fluent_ui2/fluent_ui.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 
@@ -705,6 +705,7 @@ class FlyoutController with ChangeNotifier, WidgetsBindingObserver {
     assert(isAttached, 'This controller must be attached to a FlyoutTarget');
   }
 
+  Duration _closingDuration = Duration.zero;
   OverlayEntry? _overlayEntry;
 
   /// Whether the flyout is open
@@ -799,6 +800,7 @@ class FlyoutController with ChangeNotifier, WidgetsBindingObserver {
   Future<T?> showFlyout<T>({
     required WidgetBuilder builder,
     bool barrierDismissible = true,
+    void Function()? onBarrierDismiss,
     bool dismissWithEsc = true,
     bool dismissOnPointerMoveAway = false,
     FlyoutPlacementMode placementMode = FlyoutPlacementMode.auto,
@@ -820,6 +822,7 @@ class FlyoutController with ChangeNotifier, WidgetsBindingObserver {
     RouteSettings? settings,
     GestureRecognizer? barrierRecognizer,
     bool buildTarget = false,
+    Duration closingDuration = Duration.zero,
   }) async {
     _ensureAttached();
     assert(_attachState!.mounted);
@@ -891,7 +894,10 @@ class FlyoutController with ChangeNotifier, WidgetsBindingObserver {
               targetSize: targetSize,
               flyoutKey: flyoutKey,
               navigatorBox: navigatorBox,
-              onDismiss: closeOverlay,
+              onDismiss: () {
+                if (onBarrierDismiss != null) onBarrierDismiss();
+                closeOverlay();
+              },
               barrierColor: barrierColor,
               barrierMargin: barrierMargin,
               barrierBlocking: barrierBlocking,
@@ -911,14 +917,16 @@ class FlyoutController with ChangeNotifier, WidgetsBindingObserver {
                   parent: const AlwaysStoppedAnimation<double>(1)),
               transitionDuration: transitionDuration,
               reverseTransitionDuration: reverseTransitionDuration,
-              position: position,
               builder: builder,
+              position: position,
               buildTarget: buildTarget,
             );
           },
         ),
       );
     });
+    _closingDuration = closingDuration;
+
     overlay.insert(_overlayEntry!);
     notifyListeners();
 
@@ -936,14 +944,19 @@ class FlyoutController with ChangeNotifier, WidgetsBindingObserver {
   /// If [force] is true, the flyout is removed from the navigator stack without
   /// completing the transition.
   void close([bool force = false]) {
-    _ensureAttached();
+    if (!isAttached) return;
     closeOverlay(force);
   }
 
   void closeOverlay([bool force = false]) {
     if (_overlayEntry != null) {
-      _overlayEntry!.remove();
-      _overlayEntry = null;
+      // Wait for the closingDuration so that the flyout content's closing animation can play.
+      Future.delayed(_closingDuration, () {
+        if (_overlayEntry != null) {
+          _overlayEntry!.remove();
+          _overlayEntry = null;
+        }
+      });
     } else if (_route != null) {
       // fallback if a route was used
       if (force) {

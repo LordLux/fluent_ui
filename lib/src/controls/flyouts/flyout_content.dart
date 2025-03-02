@@ -1,4 +1,4 @@
-import 'package:fluent_ui/fluent_ui.dart';
+import 'package:fluent_ui2/fluent_ui.dart';
 
 /// Eyeballed value from Windows Home 11.
 const kFlyoutMinConstraints = BoxConstraints(minWidth: 118);

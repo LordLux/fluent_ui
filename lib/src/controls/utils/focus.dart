@@ -1,6 +1,6 @@
 import 'dart:ui' show lerpDouble;
 
-import 'package:fluent_ui/fluent_ui.dart';
+import 'package:fluent_ui2/fluent_ui.dart';
 import 'package:flutter/foundation.dart';
 
 /// A focus border creates an animated border around a widget whenever it has
