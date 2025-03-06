@@ -1,7 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:example/widgets/page.dart';
-import 'package:fluent_ui2/fluent_ui.dart';
+import 'package:fluent_ui3/fluent_ui.dart';
 import 'package:url_launcher/link.dart';
 
 import '../../widgets/card_highlight.dart';

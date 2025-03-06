@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart';
 import 'package:system_theme/system_theme.dart';
 
-import 'package:fluent_ui2/fluent_ui.dart';
+import 'package:fluent_ui3/fluent_ui.dart';
 
 enum NavigationIndicators { sticky, end }
 

@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 
-import 'package:fluent_ui2/fluent_ui.dart';
-import 'package:fluent_ui2/src/controls/pickers/pickers.dart';
+import 'package:fluent_ui3/fluent_ui.dart';
+import 'package:fluent_ui3/src/controls/pickers/pickers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 

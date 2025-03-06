@@ -1,4 +1,4 @@
-import 'package:fluent_ui2/fluent_ui.dart';
+import 'package:fluent_ui3/fluent_ui.dart';
 import 'package:flutter/foundation.dart';
 
 /// An info label lets the user know what an element of the ui

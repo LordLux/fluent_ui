@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:fluent_ui2/fluent_ui.dart';
+import 'package:fluent_ui3/fluent_ui.dart';
 
 /// The padding used on the content of [DatePicker] and [TimePicker]
 const kPickerContentPadding = EdgeInsetsDirectional.only(

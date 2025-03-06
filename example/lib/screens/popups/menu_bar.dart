@@ -1,6 +1,6 @@
 import 'package:example/widgets/card_highlight.dart';
 import 'package:example/widgets/page.dart';
-import 'package:fluent_ui2/fluent_ui.dart';
+import 'package:fluent_ui3/fluent_ui.dart';
 
 class MenuBarPage extends StatefulWidget {
   const MenuBarPage({super.key});

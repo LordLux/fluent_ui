@@ -1,4 +1,4 @@
-import 'package:fluent_ui2/fluent_ui.dart';
+import 'package:fluent_ui3/fluent_ui.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
@@ -10,10 +10,14 @@ class MenuBarItem with Diagnosticable {
   /// The collection of commands for this item.
   final List<MenuFlyoutItemBase> items;
 
+  /// Called when the menu bar item (the top-level button) is clicked.
+  final VoidCallback? onClicked; // new parameter
+
   /// Creates a menu bar item.
   const MenuBarItem({
     required this.title,
     required this.items,
+    this.onClicked,
   });
 
   @override
@@ -31,6 +35,8 @@ class MenuBarItem with Diagnosticable {
     super.debugFillProperties(properties);
     properties.add(StringProperty('title', title));
     properties.add(IterableProperty<MenuFlyoutItemBase>('items', items));
+    properties
+        .add(ObjectFlagProperty<VoidCallback?>.has('onClicked', onClicked));
   }
 }
 
@@ -244,6 +250,8 @@ class MenuBarState extends State<MenuBar> {
                           end: barMargin.end,
                         ),
                         onPressed: () {
+                          // Run the onClicked callback if provided.
+                          item.onClicked?.call();
                           _locked = false;
                           _showFlyout(context, item);
                         },

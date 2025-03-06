@@ -1,4 +1,4 @@
-import 'package:fluent_ui2/fluent_ui.dart';
+import 'package:fluent_ui3/fluent_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

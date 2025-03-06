@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:example/widgets/card_highlight.dart';
-import 'package:fluent_ui2/fluent_ui.dart' hide Page;
+import 'package:fluent_ui3/fluent_ui.dart' hide Page;
 
 import '../../widgets/page.dart';
 

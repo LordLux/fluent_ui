@@ -1,6 +1,6 @@
 import 'package:example/screens/home.dart';
 import 'package:example/screens/settings.dart';
-import 'package:fluent_ui2/fluent_ui.dart' hide Page;
+import 'package:fluent_ui3/fluent_ui.dart' hide Page;
 import 'package:flutter/foundation.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart' as flutter_acrylic;
 import 'package:go_router/go_router.dart';

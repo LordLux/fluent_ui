@@ -1,4 +1,4 @@
-import 'package:fluent_ui2/fluent_ui.dart';
+import 'package:fluent_ui3/fluent_ui.dart';
 
 enum PasswordRevealMode {
   /// The password reveal button is visible. The password is not obscured while

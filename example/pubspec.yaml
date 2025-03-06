@@ -11,7 +11,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  fluent_ui2:
+  fluent_ui3:
     path: ../
   provider: ^6.0.5
   system_theme: ^2.3.1

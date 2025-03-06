@@ -1,4 +1,4 @@
-import 'package:fluent_ui2/l10n/generated/fluent_localizations.dart';
+import 'package:fluent_ui3/l10n/generated/fluent_localizations.dart';
 import 'package:flutter/foundation.dart';
 
 // Special cases - Those that include operating system dependent messages

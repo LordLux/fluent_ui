@@ -1,6 +1,6 @@
-import 'package:fluent_ui2/fluent_ui.dart';
-import 'package:fluent_ui2/src/controls/pickers/pickers.dart';
-import 'package:fluent_ui2/src/intl_script_locale_apply_mixin.dart';
+import 'package:fluent_ui3/fluent_ui.dart';
+import 'package:fluent_ui3/src/controls/pickers/pickers.dart';
+import 'package:fluent_ui3/src/intl_script_locale_apply_mixin.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';

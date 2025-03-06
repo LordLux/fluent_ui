@@ -1,5 +1,5 @@
-import 'package:fluent_ui2/fluent_ui.dart';
-import 'package:fluent_ui2/src/controls/pickers/color_picker/color_spectrum.dart';
+import 'package:fluent_ui3/fluent_ui.dart';
+import 'package:fluent_ui3/src/controls/pickers/color_picker/color_spectrum.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'app_test.dart';

@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 import 'dart:ui' as dart;
 
-import 'package:fluent_ui2/fluent_ui.dart';
+import 'package:fluent_ui3/fluent_ui.dart';
 
 import 'color_state.dart';
 

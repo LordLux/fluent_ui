@@ -1,5 +1,5 @@
 import 'package:example/widgets/card_highlight.dart';
-import 'package:fluent_ui2/fluent_ui.dart';
+import 'package:fluent_ui3/fluent_ui.dart';
 import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 import 'package:window_manager/window_manager.dart';

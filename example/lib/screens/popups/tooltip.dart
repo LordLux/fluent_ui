@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:example/widgets/card_highlight.dart';
 import 'package:example/widgets/page.dart';
-import 'package:fluent_ui2/fluent_ui.dart';
+import 'package:fluent_ui3/fluent_ui.dart';
 
 class TooltipPage extends StatelessWidget with PageMixin {
   TooltipPage({super.key});

@@ -1,5 +1,5 @@
 import 'package:clipboard/clipboard.dart';
-import 'package:fluent_ui2/fluent_ui.dart';
+import 'package:fluent_ui3/fluent_ui.dart';
 
 Future<void> showCopiedSnackbar(BuildContext context, String copiedText) {
   return displayInfoBar(

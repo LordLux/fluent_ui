@@ -1,4 +1,4 @@
-import 'package:fluent_ui2/fluent_ui.dart';
+import 'package:fluent_ui3/fluent_ui.dart';
 import 'package:flutter/gestures.dart';
 
 /// A specialized kind of [SingleChildScrollView] that only scrolls
