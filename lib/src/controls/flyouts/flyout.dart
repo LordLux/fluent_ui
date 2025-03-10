@@ -707,6 +707,8 @@ class FlyoutController with ChangeNotifier, WidgetsBindingObserver {
 
   Duration _closingDuration = Duration.zero;
   OverlayEntry? _overlayEntry;
+  final GlobalKey<_FlyoutPageState> _barrierColorKey =
+      GlobalKey<_FlyoutPageState>();
 
   /// Whether the flyout is open
   ///
@@ -853,6 +855,7 @@ class FlyoutController with ChangeNotifier, WidgetsBindingObserver {
 
     final GlobalKey flyoutKey = GlobalKey();
     final OverlayState overlay = Overlay.of(context);
+
     _overlayEntry = OverlayEntry(builder: (context) {
       return DismissOnEsc(
         onDismiss: closeOverlay,
@@ -887,6 +890,7 @@ class FlyoutController with ChangeNotifier, WidgetsBindingObserver {
             };
 
             return _FlyoutPage(
+              key: _barrierColorKey,
               navigator: _currentNavigator ?? Navigator.of(context),
               targetRect: targetRect,
               attachState: _attachState,
@@ -950,6 +954,9 @@ class FlyoutController with ChangeNotifier, WidgetsBindingObserver {
 
   void closeOverlay([bool force = false]) {
     if (_overlayEntry != null) {
+      if (_barrierColorKey.currentState != null) {
+        _barrierColorKey.currentState!.updateBarrierColor(Colors.transparent);
+      }
       // Wait for the closingDuration so that the flyout content's closing animation can play.
       Future.delayed(_closingDuration, () {
         if (_overlayEntry != null) {
@@ -989,6 +996,7 @@ class FlyoutController with ChangeNotifier, WidgetsBindingObserver {
 /// to the [transitionBuilder] callback.
 class _FlyoutPage extends StatefulWidget {
   const _FlyoutPage({
+    super.key,
     required this.navigator,
     required this.targetRect,
     required _FlyoutTargetState? attachState,
@@ -1054,16 +1062,39 @@ class _FlyoutPage extends StatefulWidget {
 
 class _FlyoutPageState extends State<_FlyoutPage> {
   FlyoutPlacementMode? _autoMode;
+  Color _barrierColor = Colors.transparent;
 
   final _key = GlobalKey<State>();
+
+  @override
+  void initState() {
+    super.initState();
+    _updateBarrierColor();
+  }
+
+  void _updateBarrierColor() async {
+    await Future.delayed(
+        (widget.transitionDuration ?? const Duration(milliseconds: 200)) ~/ 2);
+    setState(() {
+      _barrierColor =
+          widget.barrierColor ?? Colors.black.withValues(alpha: 0.3);
+    });
+  }
+
+  void updateBarrierColor(Color color) {
+    setState(() {
+      _barrierColor = color;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return MenuInfoProvider(builder: (context, rootSize, menus, keys) {
       assert(menus.length == keys.length);
 
-      final barrier = ColoredBox(
-        color: widget.barrierColor ?? Colors.black.withValues(alpha: 0.3),
+      final barrier = AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        color: _barrierColor,
       );
 
       Widget box = Stack(children: [
