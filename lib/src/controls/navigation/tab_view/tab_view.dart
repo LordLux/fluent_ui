@@ -44,7 +44,9 @@ class TabView extends StatefulWidget {
     this.topPadding = 2.0,
     this.newTabIcon = const Icon(FluentIcons.add),
     this.addIconBuilder,
-    this.shortcutsEnabled = true,
+    this.shortcutClose = true,
+    this.shortcutNew = true,
+    this.shortcutQuickTab = true,
     this.onReorder,
     this.showScrollButtons = true,
     this.scrollController,
@@ -98,13 +100,25 @@ class TabView extends StatefulWidget {
 
   /// Whether the following shortcuts are enabled:
   ///
-  ///   * `Ctrl + T` to create a new tab
   ///   * `Ctrl + F4` or `Ctrl + W` to close the current tab
+  ///
+  /// Defaults to `true`.
+  final bool shortcutClose;
+
+  /// Whether the following shortcut is enabled:
+  ///
+  ///   * `Ctrl + T` to create a new tab
+  ///
+  /// Defaults to `true`.
+  final bool shortcutNew;
+
+  /// Whether the following shortcuts are enabled:
+  ///
   ///   * `Ctrl + 1` to ` Ctrl + 8` to navigate through tabs
   ///   * `Ctrl + 9` to navigate to the last tab
   ///
   /// Defaults to `true`.
-  final bool shortcutsEnabled;
+  final bool shortcutQuickTab;
 
   /// Called when the tabs are reordered.
   ///
@@ -533,6 +547,7 @@ class _TabViewState extends State<TabView> {
                                         start: 3.0,
                                         top: 3.0,
                                         bottom: 3.0,
+                                        end: 3.0,
                                       ),
                                       child: _buttonTabBuilder(
                                         context,
@@ -547,10 +562,11 @@ class _TabViewState extends State<TabView> {
                                             icon = widget.newTabIcon;
                                           }
                                           icon = IconTheme.merge(
-                                            data: const IconThemeData(size: 12.0),
+                                            data:
+                                                const IconThemeData(size: 12.0),
                                             child: icon,
                                           );
-                        
+
                                           // ignore: deprecated_member_use_from_same_package
                                           return widget.addIconBuilder
                                                   ?.call(icon) ??
@@ -678,7 +694,7 @@ class _TabViewState extends State<TabView> {
           ),
         ),
     ]);
-    if (widget.shortcutsEnabled) {
+    if (widget.shortcutClose) {
       void onClosePressed() {
         close(widget.currentIndex);
       }
@@ -697,22 +713,28 @@ class _TabViewState extends State<TabView> {
         autofocus: true,
         child: CallbackShortcuts(
           bindings: {
-            SingleActivator(
-              LogicalKeyboardKey.f4,
-              control: ctrl,
-              meta: meta,
-            ): onClosePressed,
-            SingleActivator(
-              LogicalKeyboardKey.keyW,
-              control: ctrl,
-              meta: meta,
-            ): onClosePressed,
-            SingleActivator(
-              LogicalKeyboardKey.keyT,
-              control: ctrl,
-              meta: meta,
-            ): () => widget.onNewPressed?.call(),
-            ...Map.fromIterable(
+            // Close the current tab
+            if (widget.shortcutClose)
+              SingleActivator(
+                LogicalKeyboardKey.f4,
+                control: ctrl,
+                meta: meta,
+              ): onClosePressed,
+            if (widget.shortcutClose)
+              SingleActivator(
+                LogicalKeyboardKey.keyW,
+                control: ctrl,
+                meta: meta,
+              ): onClosePressed,
+
+            // Create a new tab
+            if (widget.shortcutNew)
+              SingleActivator(
+                LogicalKeyboardKey.keyT,
+                control: ctrl,
+                meta: meta,
+              ): () => widget.onNewPressed?.call(),
+            if (widget.shortcutQuickTab) ...Map.fromIterable(
               List<int>.generate(9, (index) => index),
               key: (i) {
                 final digits = [
