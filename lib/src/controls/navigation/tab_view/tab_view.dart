@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:fluent_ui3/fluent_ui.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
+import 'package:flutter/material.dart' show Material;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -40,6 +41,7 @@ class TabView extends StatefulWidget {
     required this.tabs,
     this.onNewPressed,
     this.addIconData,
+    this.topPadding = 2.0,
     this.newTabIcon = const Icon(FluentIcons.add),
     this.addIconBuilder,
     this.shortcutsEnabled = true,
@@ -56,6 +58,7 @@ class TabView extends StatefulWidget {
     this.stripBuilder,
     this.closeDelayDuration = const Duration(seconds: 1),
   });
+  final double topPadding;
 
   /// The index of the tab to be displayed
   final int currentIndex;
@@ -449,18 +452,14 @@ class _TabViewState extends State<TabView> {
       ScrollConfiguration(
         behavior: const _TabViewScrollBehavior(),
         child: Container(
-          margin: const EdgeInsetsDirectional.only(top: 4.5),
-          padding: const EdgeInsetsDirectional.only(start: 8),
+          padding: EdgeInsets.only(top: widget.topPadding),
           height: _kTileHeight,
           width: double.infinity,
           child: Row(children: [
             if (widget.header != null)
-              Padding(
-                padding: const EdgeInsetsDirectional.only(end: 12.0),
-                child: DefaultTextStyle.merge(
-                  style: headerFooterTextStyle,
-                  child: widget.header!,
-                ),
+              DefaultTextStyle.merge(
+                style: headerFooterTextStyle,
+                child: widget.header!,
               ),
             Expanded(
               child: LayoutBuilder(builder: (context, consts) {
@@ -501,22 +500,72 @@ class _TabViewState extends State<TabView> {
                     delegates: const [
                       GlobalMaterialLocalizations.delegate,
                     ],
-                    child: ReorderableListView.builder(
-                      buildDefaultDragHandles: false,
-                      shrinkWrap: true,
-                      scrollDirection: Axis.horizontal,
-                      scrollController: scrollController,
-                      onReorder: (i, ii) {
-                        widget.onReorder?.call(i, ii);
-                      },
-                      itemCount: widget.tabs.length,
-                      proxyDecorator: (child, index, animation) {
-                        return child;
-                      },
-                      itemBuilder: (context, index) {
-                        return _tabBuilder(context, index, preferredTabWidth);
-                      },
-                      dragStartBehavior: DragStartBehavior.down,
+                    child: ClipRect(
+                      child: Material(
+                        color: Colors.transparent,
+                        child: Overlay(
+                          initialEntries: [
+                            OverlayEntry(
+                              builder: (context) => Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  ReorderableListView.builder(
+                                    buildDefaultDragHandles: false,
+                                    shrinkWrap: true,
+                                    scrollDirection: Axis.horizontal,
+                                    scrollController: scrollController,
+                                    onReorder: (i, ii) {
+                                      widget.onReorder?.call(i, ii);
+                                    },
+                                    itemCount: widget.tabs.length,
+                                    proxyDecorator: (child, index, animation) {
+                                      return child;
+                                    },
+                                    itemBuilder: (context, index) {
+                                      return _tabBuilder(
+                                          context, index, preferredTabWidth);
+                                    },
+                                    dragStartBehavior: DragStartBehavior.down,
+                                  ),
+                                  if (widget.showNewButton)
+                                    Padding(
+                                      padding: const EdgeInsetsDirectional.only(
+                                        start: 3.0,
+                                        top: 3.0,
+                                        bottom: 3.0,
+                                      ),
+                                      child: _buttonTabBuilder(
+                                        context,
+                                        () {
+                                          Widget icon;
+                                          // ignore: deprecated_member_use_from_same_package
+                                          if (widget.addIconData != null) {
+                                            // ignore: deprecated_member_use_from_same_package
+                                            icon = Icon(widget.addIconData,
+                                                size: 12.0);
+                                          } else {
+                                            icon = widget.newTabIcon;
+                                          }
+                                          icon = IconTheme.merge(
+                                            data: const IconThemeData(size: 12.0),
+                                            child: icon,
+                                          );
+                        
+                                          // ignore: deprecated_member_use_from_same_package
+                                          return widget.addIconBuilder
+                                                  ?.call(icon) ??
+                                              icon;
+                                        }(),
+                                        widget.onNewPressed!,
+                                        localizations.newTabLabel,
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 );
@@ -594,35 +643,7 @@ class _TabViewState extends State<TabView> {
                         ? forwardButton()
                         : backwardButton(),
                   // new tab button
-                  if (widget.showNewButton)
-                    Padding(
-                      padding: const EdgeInsetsDirectional.only(
-                        start: 3.0,
-                        bottom: 3.0,
-                      ),
-                      child: _buttonTabBuilder(
-                        context,
-                        () {
-                          Widget icon;
-                          // ignore: deprecated_member_use_from_same_package
-                          if (widget.addIconData != null) {
-                            // ignore: deprecated_member_use_from_same_package
-                            icon = Icon(widget.addIconData, size: 12.0);
-                          } else {
-                            icon = widget.newTabIcon;
-                          }
-                          icon = IconTheme.merge(
-                            data: const IconThemeData(size: 12.0),
-                            child: icon,
-                          );
 
-                          // ignore: deprecated_member_use_from_same_package
-                          return widget.addIconBuilder?.call(icon) ?? icon;
-                        }(),
-                        widget.onNewPressed!,
-                        localizations.newTabLabel,
-                      ),
-                    ),
                   // reserved strip width
                   if (widget.reservedStripWidth != null)
                     SizedBox(width: widget.reservedStripWidth),
