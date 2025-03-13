@@ -42,6 +42,7 @@ class TabView extends StatefulWidget {
     this.onNewPressed,
     this.addIconData,
     this.topPadding = 2.0,
+    this.stripBackgroundColor = Colors.transparent,
     this.newTabIcon = const Icon(FluentIcons.add),
     this.addIconBuilder,
     this.shortcutClose = true,
@@ -87,6 +88,8 @@ class TabView extends StatefulWidget {
   ///
   /// Defaults to an [Icon] with [FluentIcons.add].
   final Icon newTabIcon;
+
+  final Color stripBackgroundColor;
 
   /// The builder for the add icon.
   ///
@@ -489,6 +492,54 @@ class _TabViewState extends State<TabView> {
                         widget.tabs.length)
                     .clamp(widget.minTabWidth, widget.maxTabWidth);
 
+                Widget backwardButton() {
+                  return Padding(
+                    padding: const EdgeInsetsDirectional.all(3.0),
+                    child: _buttonTabBuilder(
+                      context,
+                      const Icon(FluentIcons.caret_left_solid8, size: 8),
+                      scrollController.canBackward
+                          ? () {
+                              if (direction == TextDirection.ltr) {
+                                scrollController.backward(align: false);
+                              } else {
+                                scrollController.forward(align: false);
+                              }
+                            }
+                          : null,
+                      localizations.scrollTabBackwardLabel,
+                    ),
+                  );
+                }
+
+                Widget forwardButton() {
+                  return Padding(
+                    padding: const EdgeInsetsDirectional.all(3.0),
+                    child: _buttonTabBuilder(
+                      context,
+                      const Icon(FluentIcons.caret_right_solid8, size: 8),
+                      scrollController.canForward
+                          ? () {
+                              if (direction == TextDirection.ltr) {
+                                scrollController.forward(align: false);
+                              } else {
+                                scrollController.backward(align: false);
+                              }
+                            }
+                          : null,
+                      localizations.scrollTabForwardLabel,
+                    ),
+                  );
+                }
+
+                /// Whether the tab bar is scrollable
+                var scrollable = preferredTabWidth * widget.tabs.length >=
+                    width - (widget.showNewButton ? _kButtonWidth : 0);
+
+                final showScrollButtons = widget.showScrollButtons &&
+                    scrollable &&
+                    scrollController.hasClients;
+
                 final Widget listView = Listener(
                   onPointerSignal: (PointerSignalEvent e) {
                     if (e is PointerScrollEvent &&
@@ -514,156 +565,87 @@ class _TabViewState extends State<TabView> {
                     delegates: const [
                       GlobalMaterialLocalizations.delegate,
                     ],
-                    child: ClipRect(
-                      child: Material(
-                        color: Colors.transparent,
-                        child: Overlay(
-                          initialEntries: [
-                            OverlayEntry(
-                              builder: (context) => Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  ReorderableListView.builder(
-                                    buildDefaultDragHandles: false,
-                                    shrinkWrap: true,
-                                    scrollDirection: Axis.horizontal,
-                                    scrollController: scrollController,
-                                    onReorder: (i, ii) {
-                                      widget.onReorder?.call(i, ii);
-                                    },
-                                    itemCount: widget.tabs.length,
-                                    proxyDecorator: (child, index, animation) {
-                                      return child;
-                                    },
-                                    itemBuilder: (context, index) {
-                                      return _tabBuilder(
-                                          context, index, preferredTabWidth);
-                                    },
-                                    dragStartBehavior: DragStartBehavior.down,
-                                  ),
-                                  if (widget.showNewButton)
-                                    Padding(
-                                      padding: const EdgeInsetsDirectional.only(
-                                        start: 3.0,
-                                        top: 3.0,
-                                        bottom: 3.0,
-                                        end: 3.0,
-                                      ),
-                                      child: _buttonTabBuilder(
-                                        context,
-                                        () {
-                                          Widget icon;
-                                          // ignore: deprecated_member_use_from_same_package
-                                          if (widget.addIconData != null) {
-                                            // ignore: deprecated_member_use_from_same_package
-                                            icon = Icon(widget.addIconData,
-                                                size: 12.0);
-                                          } else {
-                                            icon = widget.newTabIcon;
-                                          }
-                                          icon = IconTheme.merge(
-                                            data:
-                                                const IconThemeData(size: 12.0),
-                                            child: icon,
-                                          );
-
-                                          // ignore: deprecated_member_use_from_same_package
-                                          return widget.addIconBuilder
-                                                  ?.call(icon) ??
-                                              icon;
-                                        }(),
-                                        widget.onNewPressed!,
-                                        localizations.newTabLabel,
-                                      ),
-                                    ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
+                    child: Material(
+                      color: widget.stripBackgroundColor,
+                      child: ReorderableListView.builder(
+                        buildDefaultDragHandles: false,
+                        shrinkWrap: true,
+                        scrollDirection: Axis.horizontal,
+                        scrollController: scrollController,
+                        onReorder: (i, ii) {
+                          widget.onReorder?.call(i, ii);
+                        },
+                        itemCount: widget.tabs.length,
+                        proxyDecorator: (child, index, animation) {
+                          return child;
+                        },
+                        itemBuilder: (context, index) {
+                          return _tabBuilder(context, index, preferredTabWidth);
+                        },
+                        dragStartBehavior: DragStartBehavior.down,
                       ),
                     ),
                   ),
                 );
 
-                /// Whether the tab bar is scrollable
-                var scrollable = preferredTabWidth * widget.tabs.length >
-                    width - (widget.showNewButton ? _kButtonWidth : 0);
+                final strip = Container(
+                  color: widget.stripBackgroundColor,
+                  child: Row(children: [
+                    // scroll buttons if needed
+                    if (showScrollButtons)
+                      direction == TextDirection.ltr
+                          ? backwardButton()
+                          : forwardButton(),
 
-                final showScrollButtons = widget.showScrollButtons &&
-                    scrollable &&
-                    scrollController.hasClients;
+                    // tabs area (flexible/expanded)
+                    if (scrollable)
+                      Expanded(child: listView)
+                    else
+                      Flexible(child: listView),
 
-                Widget backwardButton() {
-                  return Padding(
-                    padding: const EdgeInsetsDirectional.only(
-                      start: 8.0,
-                      end: 3.0,
-                      bottom: 3.0,
-                    ),
-                    child: _buttonTabBuilder(
-                      context,
-                      const Icon(FluentIcons.caret_left_solid8, size: 8),
-                      scrollController.canBackward
-                          ? () {
-                              if (direction == TextDirection.ltr) {
-                                scrollController.backward(align: false);
-                              } else {
-                                scrollController.forward(align: false);
-                              }
+                    // scroll buttons if needed
+                    if (showScrollButtons)
+                      direction == TextDirection.ltr
+                          ? forwardButton()
+                          : backwardButton(),
+
+                    // new tab button
+                    if (widget.showNewButton)
+                      Padding(
+                        padding: const EdgeInsetsDirectional.only(
+                          start: 3.0,
+                          top: 3.0,
+                          bottom: 3.0,
+                          end: 3.0,
+                        ),
+                        child: _buttonTabBuilder(
+                          context,
+                          () {
+                            Widget icon;
+                            // ignore: deprecated_member_use_from_same_package
+                            if (widget.addIconData != null) {
+                              // ignore: deprecated_member_use_from_same_package
+                              icon = Icon(widget.addIconData, size: 12.0);
+                            } else {
+                              icon = widget.newTabIcon;
                             }
-                          : null,
-                      localizations.scrollTabBackwardLabel,
-                    ),
-                  );
-                }
+                            icon = IconTheme.merge(
+                              data: const IconThemeData(size: 12.0),
+                              child: icon,
+                            );
 
-                Widget forwardButton() {
-                  return Padding(
-                    padding: const EdgeInsetsDirectional.only(
-                      start: 3.0,
-                      end: 8.0,
-                      bottom: 3.0,
-                    ),
-                    child: _buttonTabBuilder(
-                      context,
-                      const Icon(FluentIcons.caret_right_solid8, size: 8),
-                      scrollController.canForward
-                          ? () {
-                              if (direction == TextDirection.ltr) {
-                                scrollController.forward(align: false);
-                              } else {
-                                scrollController.backward(align: false);
-                              }
-                            }
-                          : null,
-                      localizations.scrollTabForwardLabel,
-                    ),
-                  );
-                }
-
-                final strip = Row(children: [
-                  // scroll buttons if needed
-                  if (showScrollButtons)
-                    direction == TextDirection.ltr
-                        ? backwardButton()
-                        : forwardButton(),
-                  // tabs area (flexible/expanded)
-                  if (scrollable)
-                    Expanded(child: listView)
-                  else
-                    Flexible(child: listView),
-                  // scroll buttons if needed
-                  if (showScrollButtons)
-                    direction == TextDirection.ltr
-                        ? forwardButton()
-                        : backwardButton(),
-                  // new tab button
-
-                  // reserved strip width
-                  if (widget.reservedStripWidth != null)
-                    SizedBox(width: widget.reservedStripWidth),
-                ]);
+                            // ignore: deprecated_member_use_from_same_package
+                            return widget.addIconBuilder?.call(icon) ?? icon;
+                          }(),
+                          widget.onNewPressed!,
+                          localizations.newTabLabel,
+                        ),
+                      ),
+                    // reserved strip width
+                    if (widget.reservedStripWidth != null)
+                      SizedBox(width: widget.reservedStripWidth),
+                  ]),
+                );
 
                 if (widget.stripBuilder != null) {
                   return widget.stripBuilder!(context, strip);
@@ -694,7 +676,7 @@ class _TabViewState extends State<TabView> {
           ),
         ),
     ]);
-    if (widget.shortcutClose) {
+    if (widget.shortcutClose || widget.shortcutNew || widget.shortcutQuickTab) {
       void onClosePressed() {
         close(widget.currentIndex);
       }
@@ -708,7 +690,7 @@ class _TabViewState extends State<TabView> {
         ctrl = false;
         meta = true;
       }
-
+      
       return FocusScope(
         autofocus: true,
         child: CallbackShortcuts(
@@ -734,35 +716,36 @@ class _TabViewState extends State<TabView> {
                 control: ctrl,
                 meta: meta,
               ): () => widget.onNewPressed?.call(),
-            if (widget.shortcutQuickTab) ...Map.fromIterable(
-              List<int>.generate(9, (index) => index),
-              key: (i) {
-                final digits = [
-                  LogicalKeyboardKey.digit1,
-                  LogicalKeyboardKey.digit2,
-                  LogicalKeyboardKey.digit3,
-                  LogicalKeyboardKey.digit4,
-                  LogicalKeyboardKey.digit5,
-                  LogicalKeyboardKey.digit6,
-                  LogicalKeyboardKey.digit7,
-                  LogicalKeyboardKey.digit8,
-                  LogicalKeyboardKey.digit9,
-                ];
-                return SingleActivator(digits[i], control: ctrl, meta: meta);
-              },
-              value: (index) {
-                return () {
-                  // If it's the last, move to the last tab
-                  if (index == 8) {
-                    widget.onChanged?.call(widget.tabs.length - 1);
-                  } else {
-                    if (widget.tabs.length - 1 >= index) {
-                      widget.onChanged?.call(index);
+            if (widget.shortcutQuickTab)
+              ...Map.fromIterable(
+                List<int>.generate(9, (index) => index),
+                key: (i) {
+                  final digits = [
+                    LogicalKeyboardKey.digit1,
+                    LogicalKeyboardKey.digit2,
+                    LogicalKeyboardKey.digit3,
+                    LogicalKeyboardKey.digit4,
+                    LogicalKeyboardKey.digit5,
+                    LogicalKeyboardKey.digit6,
+                    LogicalKeyboardKey.digit7,
+                    LogicalKeyboardKey.digit8,
+                    LogicalKeyboardKey.digit9,
+                  ];
+                  return SingleActivator(digits[i], control: ctrl, meta: meta);
+                },
+                value: (index) {
+                  return () {
+                    // If it's the last, move to the last tab
+                    if (index == 8) {
+                      widget.onChanged?.call(widget.tabs.length - 1);
+                    } else {
+                      if (widget.tabs.length - 1 >= index) {
+                        widget.onChanged?.call(index);
+                      }
                     }
-                  }
-                };
-              },
-            ),
+                  };
+                },
+              ),
           },
           child: tabBar,
         ),

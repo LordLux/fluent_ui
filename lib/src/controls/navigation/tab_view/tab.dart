@@ -405,13 +405,9 @@ class TabState extends State<Tab>
                             ),
                           ),
                         ),
-                      if (widget.onClosed != null &&
-                          widget.closeIcon != null &&
-                          (tab.visibilityMode ==
-                                  CloseButtonVisibilityMode.always ||
-                              (tab.visibilityMode ==
-                                      CloseButtonVisibilityMode.onHover &&
-                                  states.isHovered)))
+                      if (widget.onClosed != null && widget.closeIcon != null &&(
+                               tab.visibilityMode == CloseButtonVisibilityMode.always ||
+                              (tab.visibilityMode == CloseButtonVisibilityMode.onHover && states.isHovered)))
                         Padding(
                           padding: const EdgeInsetsDirectional.only(start: 4.0),
                           child: FocusTheme(
