@@ -158,7 +158,7 @@ class Tab extends StatefulWidget {
   Tab({
     super.key,
     this.icon = const SizedBox.shrink(),
-    required this.text,
+    required String text,
     required this.body,
     this.backgroundColor,
     this.selectedBackgroundColor,
@@ -168,17 +168,25 @@ class Tab extends StatefulWidget {
     this.semanticLabel,
     this.disabled = false,
     this.gestures = const {},
-  });
+  }) : _textNotifier = ValueNotifier<String>(text);
 
   /// the IconSource to be displayed within the tab.
   ///
   /// Usually an [Icon] widget
   final Widget? icon;
 
-  /// The content that appears inside the tab strip to represent the tab.
+  /// The text displayed on the tab.
   ///
-  /// Usually a [Text] widget
-  final Widget text;
+  /// To update the text after the tab is created, use [updateText].
+  final ValueNotifier<String> _textNotifier;
+
+  /// Gets the current text of the tab
+  String get text => _textNotifier.value;
+
+  /// Updates the text of the tab and triggers a rebuild
+  void updateText(String newText) {
+    _textNotifier.value = newText;
+  }
 
   /// The close icon of the tab.
   ///
@@ -242,7 +250,7 @@ class Tab extends StatefulWidget {
       ..add(ColorProperty('backgroundColor', backgroundColor))
       ..add(ColorProperty('selectedBackgroundColor', selectedBackgroundColor))
       ..add(ColorProperty('outlineColor', outlineColor))
-      ..add(DiagnosticsProperty<Widget>('text', text))
+      ..add(DiagnosticsProperty<String>('text', text))
       ..add(DiagnosticsProperty<Widget>('body', body))
       ..add(DiagnosticsProperty<Widget>('icon', icon))
       ..add(DiagnosticsProperty<Widget>('closeIcon', closeIcon))
@@ -401,7 +409,12 @@ class TabState extends State<Tab>
                               maxLines: 1,
                               overflow: TextOverflow.clip,
                               style: const TextStyle(fontSize: 12.0),
-                              child: widget.text,
+                              child: ValueListenableBuilder<String>(
+                                valueListenable: widget._textNotifier,
+                                builder: (context, value, child) {
+                                  return Text(value);
+                                },
+                              ),
                             ),
                           ),
                         ),

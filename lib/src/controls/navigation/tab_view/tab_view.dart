@@ -351,7 +351,6 @@ class _TabViewState extends State<TabView> {
   ) {
     final tab = widget.tabs[index];
     final tabWidget = TabData(
-      key: ValueKey<int>(index),
       reorderIndex: widget.isReorderEnabled ? index : null,
       selected: index == widget.currentIndex,
       onPressed:
@@ -580,7 +579,13 @@ class _TabViewState extends State<TabView> {
                           return child;
                         },
                         itemBuilder: (context, index) {
-                          return _tabBuilder(context, index, preferredTabWidth);
+                          return ValueListenableBuilder<String>(
+                            key: ValueKey<int>(index),
+                            valueListenable: widget.tabs[index]._textNotifier,
+                            builder: (context, text, _) {
+                              return _tabBuilder(context, index, preferredTabWidth);
+                            },
+                          );
                         },
                         dragStartBehavior: DragStartBehavior.down,
                       ),
@@ -752,5 +757,14 @@ class _TabViewState extends State<TabView> {
       );
     }
     return tabBar;
+  }
+  
+  Widget _buildTab(Tab tab, String text) {
+    // Build the tab using the current text value
+    return ListTile(
+      title: Text(text),
+      leading: tab.icon,
+      // ...other tab properties
+    );
   }
 }
