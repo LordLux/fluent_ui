@@ -60,6 +60,7 @@ class TabView extends StatefulWidget {
     this.reservedStripWidth,
     this.stripBuilder,
     this.closeDelayDuration = const Duration(seconds: 1),
+    this.keepTabsAlive = false,
   });
   final double topPadding;
 
@@ -192,6 +193,14 @@ class TabView extends StatefulWidget {
   /// Defaults to 400 milliseconds.
   final Duration closeDelayDuration;
 
+  /// Whether to keep all tabs alive when they're not visible.
+  ///
+  /// When true, an [IndexedStack] is used to maintain the state of all tabs,
+  /// preventing them from being disposed when not in view.
+  ///
+  /// When false (default), only the current tab is kept in the widget tree.
+  final bool keepTabsAlive;
+
   /// Whenever the new button should be displayed.
   bool get showNewButton => onNewPressed != null;
 
@@ -258,7 +267,13 @@ class TabView extends StatefulWidget {
       ))
       ..add(DoubleProperty('minTabWidth', minTabWidth, defaultValue: 80.0))
       ..add(DoubleProperty('maxTabWidth', maxTabWidth, defaultValue: 240.0))
-      ..add(DoubleProperty('minFooterWidth', reservedStripWidth));
+      ..add(DoubleProperty('minFooterWidth', reservedStripWidth))
+      ..add(FlagProperty(
+        'keepTabsAlive',
+        value: keepTabsAlive,
+        defaultValue: false,
+        ifTrue: 'tabs remain alive when not visible',
+      ));
   }
 }
 
@@ -583,7 +598,8 @@ class _TabViewState extends State<TabView> {
                             key: ValueKey<int>(index),
                             valueListenable: widget.tabs[index]._textNotifier,
                             builder: (context, text, _) {
-                              return _tabBuilder(context, index, preferredTabWidth);
+                              return _tabBuilder(
+                                  context, index, preferredTabWidth);
                             },
                           );
                         },
@@ -677,6 +693,7 @@ class _TabViewState extends State<TabView> {
             child: _TabBody(
               index: widget.currentIndex,
               tabs: widget.tabs,
+              keepTabsAlive: widget.keepTabsAlive,
             ),
           ),
         ),
@@ -695,7 +712,7 @@ class _TabViewState extends State<TabView> {
         ctrl = false;
         meta = true;
       }
-      
+
       return FocusScope(
         autofocus: true,
         child: CallbackShortcuts(
@@ -758,7 +775,7 @@ class _TabViewState extends State<TabView> {
     }
     return tabBar;
   }
-  
+
   Widget _buildTab(Tab tab, String text) {
     // Build the tab using the current text value
     return ListTile(

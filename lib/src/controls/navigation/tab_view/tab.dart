@@ -97,8 +97,13 @@ class TabData extends InheritedWidget {
 class _TabBody extends StatefulWidget {
   final int index;
   final List<Tab> tabs;
+  final bool keepTabsAlive;
 
-  const _TabBody({required this.index, required this.tabs});
+  const _TabBody({
+    required this.index,
+    required this.tabs,
+    required this.keepTabsAlive,
+  });
 
   @override
   State<_TabBody> createState() => __TabBodyState();
@@ -119,16 +124,39 @@ class __TabBodyState extends State<_TabBody> {
   @override
   void didUpdateWidget(_TabBody oldWidget) {
     super.didUpdateWidget(oldWidget);
+
     if (pageController.hasClients) {
       if (oldWidget.index != widget.index ||
           pageController.page != widget.index) {
         pageController.jumpToPage(widget.index);
       }
     }
+
+    if (widget.keepTabsAlive && oldWidget.index != widget.index) {
+      setState(() {});
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    if (widget.keepTabsAlive) {
+      return IndexedStack(
+        key: ValueKey<int>(widget.index),
+        index: widget.index,
+        sizing: StackFit.expand,
+        children: widget.tabs.asMap().entries.map((entry) {
+          final i = entry.key;
+          final item = entry.value;
+          return ExcludeFocus(
+            key: ValueKey(i),
+            excluding: i != widget.index,
+            child: FocusTraversalGroup(
+              child: item.body,
+            ),
+          );
+        }).toList(),
+      );
+    }
     return PageView.builder(
       key: _pageKey,
       physics: const NeverScrollableScrollPhysics(),
@@ -137,7 +165,6 @@ class __TabBodyState extends State<_TabBody> {
       itemBuilder: (context, index) {
         final isSelected = widget.index == index;
         final item = widget.tabs[index];
-
         return ExcludeFocus(
           key: ValueKey(index),
           excluding: !isSelected,
@@ -418,9 +445,13 @@ class TabState extends State<Tab>
                             ),
                           ),
                         ),
-                      if (widget.onClosed != null && widget.closeIcon != null &&(
-                               tab.visibilityMode == CloseButtonVisibilityMode.always ||
-                              (tab.visibilityMode == CloseButtonVisibilityMode.onHover && states.isHovered)))
+                      if (widget.onClosed != null &&
+                          widget.closeIcon != null &&
+                          (tab.visibilityMode ==
+                                  CloseButtonVisibilityMode.always ||
+                              (tab.visibilityMode ==
+                                      CloseButtonVisibilityMode.onHover &&
+                                  states.isHovered)))
                         Padding(
                           padding: const EdgeInsetsDirectional.only(start: 4.0),
                           child: FocusTheme(
